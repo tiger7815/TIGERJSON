@@ -1,4 +1,3 @@
-from fileinput import filename
 from pyrogram import filters, Client as ace
 from main import LOGGER, prefixes
 from pyrogram.types import Message
@@ -31,19 +30,19 @@ async def drm(bot: ace, m: Message):
     keysData = inputKeys.text.split("\n")
     for k in keysData:
         key = f"{k} "
-        keys+=key
+        keys += key
     print(keys)
 
     BOT = TgClient(bot, m, path)
     Thumb = await BOT.thumb()
-    prog  = await bot.send_message(m.chat.id, f"**Downloading Drm Video!** - [{name}]({mpd})")
+    prog = await bot.send_message(m.chat.id, f"**Downloading Drm Video!** - [{name}]({mpd})")
 
     cmd1 = f'yt-dlp -o "{path}/fileName.%(ext)s" -f "bestvideo[height<={int(Q)}]+bestaudio" --allow-unplayable-format --external-downloader aria2c "{mpd}"'
     os.system(cmd1)
     avDir = os.listdir(path)
     print(avDir)
     print("Decrypting")
-    
+
     try:
         for data in avDir:
             if data.endswith("mp4"):
@@ -55,16 +54,14 @@ async def drm(bot: ace, m: Message):
                 os.system(cmd3)
                 os.remove(f'{path}/{data}')
 
-
         cmd4 = f'ffmpeg -i "{path}/video.mp4" -i "{path}/audio.m4a" -c copy "{path}/{name}.mp4"'
         os.system(cmd4)
         os.remove(f"{path}/video.mp4")
         os.remove(f"{path}/audio.m4a")
-        filename = f"{path}/{name}.mp4"
+        output_filename = f"{path}/{name}.mp4"
         cc = f"{name}.mp4\n\n**Description:-**\n{CP}"
-        # await DownUP.sendVideo(bot, m, filename, cc, Thumb, name, prog, path)
-        UL = Upload_to_Tg(bot=bot, m=m, file_path=filename, name=name,
-                            Thumb=Thumb, path=path, show_msg=prog, caption=cc)
+        UL = Upload_to_Tg(bot=bot, m=m, file_path=output_filename, name=name,
+                          Thumb=Thumb, path=path, show_msg=prog, caption=cc)
         await UL.upload_video()
         print("Done")
     except Exception as e:
